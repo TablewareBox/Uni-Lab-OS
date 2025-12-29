@@ -1148,6 +1148,14 @@ class BioyondV1RPC(BaseRequest):
             print(f"从缓存找到材料: {material_name_or_id} -> ID: {material_id}")
             return material_id
 
+        # 如果缓存中没有，尝试刷新缓存
+        print(f"缓存中未找到材料 '{material_name_or_id}'，尝试刷新缓存...")
+        self.refresh_material_cache()
+        if material_name_or_id in self.material_cache:
+            material_id = self.material_cache[material_name_or_id]
+            print(f"刷新缓存后找到材料: {material_name_or_id} -> ID: {material_id}")
+            return material_id
+
         print(f"警告: 未在缓存中找到材料名称 '{material_name_or_id}'，将使用原值")
         return material_name_or_id
 
