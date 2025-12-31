@@ -156,13 +156,15 @@ def test_transfer_liquid_single_channel_one_to_one(prcxi_simulation: SimulationC
         pytest.skip("仅在单通道配置下运行")
 
     handler = prcxi_simulation.handler
-    sources = _pick_wells(prcxi_simulation.source_plate, start=0, count=3)
-    targets = _pick_wells(prcxi_simulation.target_plate, start=10, count=3)
+    for well in prcxi_simulation.source_plate.children + prcxi_simulation.target_plate.children:
+        _ensure_unilabos_extra(well)
+    sources = prcxi_simulation.source_plate[0:3]
+    targets = prcxi_simulation.target_plate["A4:A6"]
     for idx, src in enumerate(sources):
         _assign_sample_uuid(src, f"single_{idx}")
     offsets = _zero_offsets(max(len(sources), len(targets)))
 
-    run(
+    result = run(
         handler.transfer_liquid(
             sources=sources,
             targets=targets,
@@ -174,6 +176,8 @@ def test_transfer_liquid_single_channel_one_to_one(prcxi_simulation: SimulationC
             mix_times=None,
         )
     )
+
+    # assert result == """"""
 
     _assert_samples_match(sources, targets)
 
